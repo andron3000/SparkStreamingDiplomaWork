@@ -21,7 +21,6 @@ public class TwitterController {
 
     @GetMapping("/")
     public String getSparkStream() {
-//        String[] filters={"#lviv"};
         JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(streamingContext);
         JavaDStream<String> words = stream.flatMap((FlatMapFunction<Status, String>) s -> Arrays.asList(s.getText().split(" ")));
         JavaDStream<String> hashTags = words.filter((Function<String, Boolean>) word -> word.startsWith("#"));
