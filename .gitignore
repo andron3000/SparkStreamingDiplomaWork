@@ -74,7 +74,6 @@ atlassian-ide-plugin.xml
 
 # Cursive Clojure plugin
 .idea/replstate.xml
-src/test/
-target/classes/application.properties
-target/classes/twitter4j.properties
-target/generated-sources/
+/src/main/resources/twitter4j.properties
+/src/main/resources/application.properties
+target/
