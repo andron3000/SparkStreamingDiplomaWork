@@ -1,10 +1,8 @@
-package model;
+package diploma.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import twitter4j.GeoLocation;
-import twitter4j.Status;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,21 +56,21 @@ public class TweetData implements Serializable {
         return links;
     }
 
-    public TweetData(Status tweet, int sentiment, String location) {
-        this.id = tweet.getId();
-        this.tweeted_at = tweet.getCreatedAt();
-        this.favorited_count = tweet.getFavoriteCount();
-        GeoLocation tweetLocation = tweet.getGeoLocation();
-        if (tweetLocation != null) {
-            this.longitude = tweet.getGeoLocation().getLongitude();
-            this.latitude = tweet.getGeoLocation().getLatitude();
-        }
-        this.location = location;
-        this.quote_id = tweet.getQuotedStatusId();
-        this.retweet_count = tweet.getRetweetCount();
-        this.text = tweet.getText();
-        this.hashtags = this.extractHastags(this.text);
-        this.links = this.extractLinks(this.text);
-        this.sentiment = sentiment;
-    }
+//    public TweetData(Status tweet, int sentiment, String location) {
+//        this.id = tweet.getId();
+//        this.tweeted_at = tweet.getCreatedAt();
+//        this.favorited_count = tweet.getFavoriteCount();
+//        GeoLocation tweetLocation = tweet.getGeoLocation();
+//        if (tweetLocation != null) {
+//            this.longitude = tweet.getGeoLocation().getLongitude();
+//            this.latitude = tweet.getGeoLocation().getLatitude();
+//        }
+//        this.location = location;
+//        this.quote_id = tweet.getQuotedStatusId();
+//        this.retweet_count = tweet.getRetweetCount();
+//        this.text = tweet.getText();
+//        this.hashtags = this.extractHastags(this.text);
+//        this.links = this.extractLinks(this.text);
+//        this.sentiment = sentiment;
+//    }
 }

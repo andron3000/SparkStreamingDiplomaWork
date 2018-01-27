@@ -1,9 +1,10 @@
-package config;
+package diploma.config;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +14,9 @@ public class SparkConfig {
     private static final String APP_NAME = "Diploma Work";
     private static final String LOCAL = "local[*]";
     private static final String ALLOW_MULTIPLE_CONTEXTS = "spark.driver.allowMultipleContexts";
-    private static final long DURATION = 5000L;
+
+    @Value("${spark.streaming.duration}")
+    private Long duration;
 
     @Bean
     public SparkConf sparkConf() {
@@ -30,6 +33,6 @@ public class SparkConfig {
 
     @Bean
     public JavaStreamingContext streamingContext() {
-        return new JavaStreamingContext(sparkContext(), new Duration(DURATION));
+        return new JavaStreamingContext(sparkContext(), new Duration(duration));
     }
 }
