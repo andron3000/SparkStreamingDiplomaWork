@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static diploma.utils.Constants.ALLOW_MULTIPLE_CONTEXTS;
+import static diploma.utils.Constants.APP_NAME;
+import static diploma.utils.Constants.LOCAL;
+
 @Configuration
 public class SparkConfig {
-
-    private static final String APP_NAME = "Diploma Work";
-    private static final String LOCAL = "local[*]";
-    private static final String ALLOW_MULTIPLE_CONTEXTS = "spark.driver.allowMultipleContexts";
 
     @Value("${spark.streaming.duration}")
     private Long duration;
