@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static diploma.utils.Constants.ALLOW_MULTIPLE_CONTEXTS;
-import static diploma.utils.Constants.APP_NAME;
-import static diploma.utils.Constants.LOCAL;
+import static diploma.utils.Constants.*;
 
 @Configuration
 public class SparkConfig {
