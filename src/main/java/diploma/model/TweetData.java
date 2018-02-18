@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 
 @Data
 @Builder
@@ -21,8 +20,7 @@ public class TweetData implements Serializable {
     private Long id;
 
     @Column(name = "create_date")
-    @Temporal(TemporalType.DATE)
-    private Date createDate;
+    private String createDate;
 
     @Column
     private String text;

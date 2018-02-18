@@ -11,10 +11,10 @@
             <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="create_date" type="date"/>
-            <column name="text" type="nvarchar(500)"/>
-            <column name="language" type="text"/>
-            <column name="country" type="text"/>
+            <column name="create_date" type="nvarchar(100)"/>
+            <column name="text" type="text"/>
+            <column name="language" type="nvarchar(25)"/>
+            <column name="country" type="nvarchar(25)"/>
         </createTable>
     </changeSet>
 

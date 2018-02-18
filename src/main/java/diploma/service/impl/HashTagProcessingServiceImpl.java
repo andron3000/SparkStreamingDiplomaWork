@@ -1,10 +1,14 @@
 package diploma.service.impl;
 
+import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
+import diploma.config.ConfigProperties;
 import diploma.converter.TweetDataConverter;
 import diploma.model.TweetData;
-import diploma.repository.TweetDataRepository;
 import diploma.service.HashTagProcessingService;
-import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.sql.DataFrame;
+import org.apache.spark.sql.SQLContext;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -14,18 +18,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import twitter4j.Status;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-
 @Service
 public class HashTagProcessingServiceImpl implements HashTagProcessingService {
 
     @Autowired
-    private TweetDataRepository tweetDataRepository;
+    private JavaStreamingContext streamingContext;
 
     @Autowired
-    private JavaStreamingContext streamingContext;
+    private SQLContext sqlContex;
+
+    @Autowired
+    private ConfigProperties configProperties;
 
     @Value("${spark.streaming.timeout.max}")
     private Long maxTimeout;
@@ -36,30 +39,21 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
     public void hashTagAnalysis() {
         checkStreamState();
 
-        JavaDStream<TweetData> tweetDataJavaDStream = stream
-                .flatMap((FlatMapFunction<Status, TweetData>) t -> Collections.singletonList(TweetDataConverter.convert(t)));
+        JavaDStream<TweetData> tweetDataDStream = stream
+                .filter(TweetDataConverter::isUtf8)
+                .map((Function<Status, TweetData>) TweetDataConverter::convert);
 
-        tweetDataJavaDStream.persist().foreachRDD(x -> {
-            if (!x.isEmpty() && x.first() != null) {
-                if(isCorrectEncoding(x.first())) {
-                    TweetData data = tweetDataRepository.save(x.first());
-                    System.out.println(data.getText());
-                }
-            }
+        tweetDataDStream.print(); // todo print stream
+
+        tweetDataDStream.foreachRDD(rdd -> {
+            DataFrame dataFrame = sqlContex.createDataFrame(rdd, TweetData.class);
+            dataFrame = dataFrame.withColumnRenamed("createDate", "create_date");
+            dataFrame.write()
+                    .mode(SaveMode.Append)
+                    .jdbc(configProperties.getProperty("url"), "tweet_data", configProperties);
         });
-
         streamingContext.start();
         streamingContext.awaitTerminationOrTimeout(maxTimeout);
-    }
-
-    private boolean isCorrectEncoding(TweetData tweetData) {
-        boolean isUtf8 = true;
-        try {
-            tweetData.getText().getBytes(StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException ignored) {
-            isUtf8 = false;
-        }
-        return isUtf8;
     }
 
     private void checkStreamState() {
