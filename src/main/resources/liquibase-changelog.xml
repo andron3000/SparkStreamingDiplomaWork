@@ -12,7 +12,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="create_date" type="nvarchar(100)"/>
-            <column name="text" type="text"/>
+            <column name="hash_tags" type="text"/>
             <column name="language" type="nvarchar(25)"/>
             <column name="country" type="nvarchar(25)"/>
         </createTable>

@@ -22,8 +22,8 @@ public class TweetData implements Serializable {
     @Column(name = "create_date")
     private String createDate;
 
-    @Column
-    private String text;
+    @Column(name = "hash_tags")
+    private String hashTags;
 
     @Column
     private String language;

@@ -1,6 +1,5 @@
 package diploma.service.impl;
 
-import com.mysql.cj.jdbc.exceptions.MysqlDataTruncation;
 import diploma.config.ConfigProperties;
 import diploma.converter.TweetDataConverter;
 import diploma.model.TweetData;
@@ -41,6 +40,7 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
 
         JavaDStream<TweetData> tweetDataDStream = stream
                 .filter(TweetDataConverter::isUtf8)
+                .filter(TweetDataConverter::containsHashTags)
                 .map((Function<Status, TweetData>) TweetDataConverter::convert);
 
         tweetDataDStream.print(); // todo print stream
@@ -48,6 +48,7 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
         tweetDataDStream.foreachRDD(rdd -> {
             DataFrame dataFrame = sqlContex.createDataFrame(rdd, TweetData.class);
             dataFrame = dataFrame.withColumnRenamed("createDate", "create_date");
+            dataFrame = dataFrame.withColumnRenamed("hashTags", "hash_tags");
             dataFrame.write()
                     .mode(SaveMode.Append)
                     .jdbc(configProperties.getProperty("url"), "tweet_data", configProperties);

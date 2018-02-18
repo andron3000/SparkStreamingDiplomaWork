@@ -3,9 +3,12 @@ package diploma.converter;
 import diploma.model.TweetData;
 import org.apache.tika.parser.txt.CharsetDetector;
 import org.apache.tika.parser.txt.CharsetMatch;
+import twitter4j.HashtagEntity;
 import twitter4j.Status;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class TweetDataConverter {
 
@@ -14,8 +17,14 @@ public class TweetDataConverter {
                 .createDate(status.getCreatedAt().toString())
                 .country(status.getPlace() != null ? status.getPlace().getCountry() : null)
                 .language(status.getLang())
-                .text(status.getText())
+                .hashTags(getTweetHashTags(status.getHashtagEntities()))
                 .build();
+    }
+
+    private static String getTweetHashTags(HashtagEntity[] entities) {
+        return Arrays.stream(entities)
+                .map(HashtagEntity::getText)
+                .collect(Collectors.joining(", "));
     }
 
     public static Boolean isUtf8(Status status) {
@@ -25,5 +34,9 @@ public class TweetDataConverter {
         CharsetMatch match = detector.detect();
 
         return StandardCharsets.UTF_8.name().equals(match.getName());
+    }
+
+    public static Boolean containsHashTags(Status status) {
+        return status.getHashtagEntities() != null && status.getHashtagEntities().length != 0;
     }
 }
