@@ -35,7 +35,7 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
     private JavaReceiverInputDStream<Status> stream;
 
     @Override
-    public void hashTagAnalysis() {
+    public void startHashTagAnalysis() {
         checkStreamState();
 
         JavaDStream<TweetData> tweetDataDStream = stream
@@ -55,6 +55,11 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
         });
         streamingContext.start();
         streamingContext.awaitTerminationOrTimeout(maxTimeout);
+    }
+
+    @Override
+    public void stopProcessingHashTags() {
+        streamingContext.stop();
     }
 
     private void checkStreamState() {

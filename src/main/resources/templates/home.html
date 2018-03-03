@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Welcome to Apache Spark</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body style="background-color: black">
+<div id="loader" style="display: none"></div>
+
+<div>
+    <span th:if="${displayStartProcessing}">
+        <form action="#" th:action="@{/start}" method="post">
+            <input type="submit" value="start stream" class="btn-primary btn-lg"
+                   onclick="showSpinner()" style="position: absolute;margin-top: 540px; margin-left: 605px;"/>
+        </form>
+    </span>
+    <span th:unless="${displayStartProcessing}">
+        <form action="#" th:action="@{/stop}" method="post">
+            <input type="submit" value="stop stream" class="btn-primary btn-lg"
+                   style="position: absolute;margin-top: 540px; margin-left: 605px;"/>
+        </form>
+    </span>
+
+    <p style="text-align:center;">
+        <img th:src="@{/images/home.jpg}" alt="Logo"/>
+    </p>
+</div>
+
+</body>
+
+<style>
+    #loader {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        margin: -75px 0 0 -75px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @-webkit-keyframes animatebottom {
+        from { bottom:-100px; opacity:0 }
+        to { bottom:0px; opacity:1 }
+    }
+
+    @keyframes animatebottom {
+        from{ bottom:-100px; opacity:0 }
+        to{ bottom:0; opacity:1 }
+    }
+</style>
+
+<script>
+    function showSpinner() {
+        document.getElementById("loader").style.display = "block";
+    }
+</script>
+
+</html>
+

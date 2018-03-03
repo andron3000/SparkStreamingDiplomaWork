@@ -2,5 +2,7 @@ package diploma.service;
 
 public interface HashTagProcessingService {
 
-    void hashTagAnalysis();
+    void startHashTagAnalysis();
+
+    void stopProcessingHashTags();
 }
