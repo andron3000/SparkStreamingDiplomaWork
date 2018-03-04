@@ -23,12 +23,9 @@ function drawTable(inputData) {
 
     data.addRows(inputData);
 
-    var table = new google.visualization.Table(document.getElementById('table_div'));
-
-    table.draw(data, {showRowNumber: true, width: '100%', height: '100%'});
+    var table = new google.visualization.Table(document.getElementById('hashTag_table'));
+    table.draw(data, {showRowNumber: true, width: '100%', height: '100%', allowHtml: true});
 }
-
-
 
 function drawAllCharts() {
     var inputData = [
