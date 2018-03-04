@@ -20,6 +20,8 @@ import twitter4j.Status;
 @Service
 public class HashTagProcessingServiceImpl implements HashTagProcessingService {
 
+    private static final String TWEET_DATA_TABLE = "tweet_data";
+
     @Autowired
     private JavaStreamingContext streamingContext;
 
@@ -51,7 +53,7 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
             dataFrame = dataFrame.withColumnRenamed("hashTags", "hash_tags");
             dataFrame.write()
                     .mode(SaveMode.Append)
-                    .jdbc(configProperties.getProperty("url"), "tweet_data", configProperties);
+                    .jdbc(configProperties.getProperty("url"), TWEET_DATA_TABLE, configProperties);
         });
         streamingContext.start();
         streamingContext.awaitTerminationOrTimeout(maxTimeout);
