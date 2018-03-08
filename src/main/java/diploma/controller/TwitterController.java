@@ -33,6 +33,7 @@ public class TwitterController {
     public String stopSparkStream(Model model) {
         model.addAttribute("optionId","0");
         hashTagProcessingService.stopProcessingHashTags();
+        hashTagProcessingService.displayAnalyticResultByDate(model, 0);
         return "result";
     }
 

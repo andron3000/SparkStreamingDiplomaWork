@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Data
 @Builder
@@ -20,7 +21,7 @@ public class TweetData implements Serializable {
     private Long id;
 
     @Column(name = "create_date")
-    private String createDate;
+    private Timestamp createDate;
 
     @Column(name = "hash_tags")
     private String hashTags;

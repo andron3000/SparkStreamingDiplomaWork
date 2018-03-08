@@ -7,6 +7,7 @@ import twitter4j.HashtagEntity;
 import twitter4j.Status;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,7 @@ public class TweetDataConverter {
 
     public static TweetData convert(Status status) {
         return TweetData.builder()
-                .createDate(status.getCreatedAt().toString())
+                .createDate(new Timestamp(status.getCreatedAt().getTime()))
                 .country(status.getPlace() != null ? status.getPlace().getCountry() : null)
                 .language(status.getLang())
                 .hashTags(getTweetHashTags(status.getHashtagEntities()))
