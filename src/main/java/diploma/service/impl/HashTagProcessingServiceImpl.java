@@ -1,7 +1,9 @@
 package diploma.service.impl;
 
 import diploma.config.ConfigProperties;
+import diploma.converter.HashTagConverter;
 import diploma.converter.TweetDataConverter;
+import diploma.model.HashTag;
 import diploma.model.TweetData;
 import diploma.service.HashTagProcessingService;
 import org.apache.spark.api.java.function.Function;
@@ -20,10 +22,11 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.List;
 
+import static diploma.utils.Constants.HASH_TAG_TABLE;
+import static diploma.utils.Constants.TWEET_DATA_TABLE;
+
 @Service
 public class HashTagProcessingServiceImpl implements HashTagProcessingService {
-
-    private static final String TWEET_DATA_TABLE = "tweet_data";
 
     @Autowired
     private JavaStreamingContext streamingContext;
@@ -42,22 +45,32 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
     @Override
     public void startHashTagAnalysis() {
         checkStreamState();
+        JavaDStream<Status> filterStreamData = stream.filter(TweetDataConverter::isUtf8)
+                                                     .filter(TweetDataConverter::containsHashTags);
 
-        JavaDStream<TweetData> tweetDataDStream = stream
-                .filter(TweetDataConverter::isUtf8)
-                .filter(TweetDataConverter::containsHashTags)
-                .map((Function<Status, TweetData>) TweetDataConverter::convert);
+        JavaDStream<TweetData> tweetDataDStream = filterStreamData.map(
+                                                    (Function<Status, TweetData>) TweetDataConverter::convert);
+
+        JavaDStream<HashTag> hashTagDataDStream = filterStreamData.flatMap((HashTagConverter::convert));
 
         tweetDataDStream.print(); // todo print stream
 
         tweetDataDStream.foreachRDD(rdd -> {
-            DataFrame dataFrame = sqlContext.createDataFrame(rdd, TweetData.class);
-            dataFrame = dataFrame.withColumnRenamed("createDate", "create_date");
-            dataFrame = dataFrame.withColumnRenamed("hashTags", "hash_tags");
-            dataFrame.write()
-                    .mode(SaveMode.Append)
-                    .jdbc(configProperties.getProperty("url"), TWEET_DATA_TABLE, configProperties);
+            DataFrame tweetDataFrame = sqlContext.createDataFrame(rdd, TweetData.class);
+            tweetDataFrame = tweetDataFrame.withColumnRenamed("createDate", "create_date");
+            tweetDataFrame = tweetDataFrame.withColumnRenamed("hashTags", "hash_tags");
+            tweetDataFrame.write()
+                          .mode(SaveMode.Append)
+                          .jdbc(configProperties.getProperty("url"), TWEET_DATA_TABLE, configProperties);
         });
+
+        hashTagDataDStream.foreachRDD(rdd -> {
+            DataFrame hashTagDataFrame = sqlContext.createDataFrame(rdd, HashTag.class);
+            hashTagDataFrame.write()
+                            .mode(SaveMode.Append)
+                            .jdbc(configProperties.getProperty("url"), HASH_TAG_TABLE, configProperties);
+        });
+
         streamingContext.start();
         streamingContext.awaitTerminationOrTimeout(maxTimeout);
     }
@@ -70,10 +83,10 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
     @Override
     public void displayAnalyticResultByDate(Model model, int i) {
         DataFrame dataFrame = sqlContext.read()
-                                       .jdbc(configProperties.getProperty("url"), TWEET_DATA_TABLE, configProperties)
-                                       .withColumnRenamed("create_date","createDate")
-                                       .withColumnRenamed("hash_tags","hashTags")
-                                       .toDF();
+                                        .jdbc(configProperties.getProperty("url"), TWEET_DATA_TABLE, configProperties)
+                                        .withColumnRenamed("create_date","createDate")
+                                        .withColumnRenamed("hash_tags","hashTags")
+                                        .toDF();
         dataFrame.registerTempTable("tweets");
 
         Timestamp timestamp = getTimestamp(i);

@@ -18,4 +18,14 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="2" author="andriy.chekhovych">
+        <createTable tableName="hash_tag">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="value" type="nvarchar(100)"/>
+            <column name="date" type="timestamp"/>
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>
