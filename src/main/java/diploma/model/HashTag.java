@@ -25,4 +25,7 @@ public class HashTag implements Serializable {
 
     @Column
     private Timestamp date;
+
+    @Column
+    private String language;
 }

@@ -25,6 +25,7 @@
             </column>
             <column name="value" type="nvarchar(100)"/>
             <column name="date" type="timestamp"/>
+            <column name="language" type="nvarchar(25)"/>
         </createTable>
     </changeSet>
 

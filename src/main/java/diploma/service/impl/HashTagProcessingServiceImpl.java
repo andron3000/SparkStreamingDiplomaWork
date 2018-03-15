@@ -3,6 +3,7 @@ package diploma.service.impl;
 import diploma.config.ConfigProperties;
 import diploma.converter.HashTagConverter;
 import diploma.converter.TweetDataConverter;
+import diploma.dto.HashTagDto;
 import diploma.model.HashTag;
 import diploma.model.TweetData;
 import diploma.service.HashTagProcessingService;
@@ -21,6 +22,8 @@ import twitter4j.Status;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static diploma.utils.Constants.HASH_TAG_TABLE;
 import static diploma.utils.Constants.TWEET_DATA_TABLE;
@@ -57,8 +60,9 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
 
         tweetDataDStream.foreachRDD(rdd -> {
             DataFrame tweetDataFrame = sqlContext.createDataFrame(rdd, TweetData.class);
-            tweetDataFrame = tweetDataFrame.withColumnRenamed("createDate", "create_date");
-            tweetDataFrame = tweetDataFrame.withColumnRenamed("hashTags", "hash_tags");
+            tweetDataFrame = tweetDataFrame
+                    .withColumnRenamed("createDate", "create_date")
+                    .withColumnRenamed("hashTags", "hash_tags");
             tweetDataFrame.write()
                           .mode(SaveMode.Append)
                           .jdbc(configProperties.getProperty("url"), TWEET_DATA_TABLE, configProperties);
@@ -83,21 +87,51 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
     @Override
     public void displayAnalyticResultByDate(Model model, int i) {
         DataFrame dataFrame = sqlContext.read()
-                                        .jdbc(configProperties.getProperty("url"), TWEET_DATA_TABLE, configProperties)
-                                        .withColumnRenamed("create_date","createDate")
-                                        .withColumnRenamed("hash_tags","hashTags")
+                                        .jdbc(configProperties.getProperty("url"), HASH_TAG_TABLE, configProperties)
                                         .toDF();
-        dataFrame.registerTempTable("tweets");
+        dataFrame.registerTempTable("tags");
+        Encoder<HashTagDto> tweetEncoder = Encoders.bean(HashTagDto.class);
 
-        Timestamp timestamp = getTimestamp(i);
-        DataFrame result = getDataFrameByDate(timestamp);
+        model.addAttribute("tweetPeriodDataMap", getDataMapPerPeriod(tweetEncoder ,i));
+        model.addAttribute("tweetAllDataMap", getDataMapPerPeriod(tweetEncoder ,2));
+        model.addAttribute("languageDataMap", getDataMapByLanguage(tweetEncoder));
+    }
 
-        Encoder<TweetData> tweetEncoder = Encoders.bean(TweetData.class);
-        List<TweetData> tweetDataList = result.as(tweetEncoder).collectAsList();
+    private Map<String, Long> getDataMapPerPeriod(Encoder<HashTagDto> tweetEncoder, Integer index) {
+        DataFrame dataPerPeriod = getDataFrameByDate(getTimestamp(index));
+        List<HashTagDto> tweetDataListPerPeriod = dataPerPeriod.as(tweetEncoder).collectAsList();
+        return tweetDataListPerPeriod
+                                    .stream()
+                                    .collect(Collectors.toMap(HashTagDto::getValue, HashTagDto::getCount));
+    }
+
+    private Map<String, Long> getDataMapByLanguage(Encoder<HashTagDto> tweetEncoder) {
+        DataFrame dataFrameByLanguage = getDataFrameByLanguage();
+        List<HashTagDto> tweetDataListPerPeriod = dataFrameByLanguage.as(tweetEncoder).collectAsList();
+        return tweetDataListPerPeriod
+                                    .stream()
+                                    .collect(Collectors.toMap(HashTagDto::getValue, HashTagDto::getCount));
     }
 
     private DataFrame getDataFrameByDate(Timestamp timestamp) {
-        String sqlQuery = String.format("SELECT * FROM tweets WHERE createDate > CAST('%s' AS TIMESTAMP)", timestamp);
+        String sqlQuery = String.format("SELECT " +
+                                                "value, COUNT(value) AS count " +
+                                                "FROM tags " +
+                                                "WHERE tags.date > CAST('%s' AS TIMESTAMP) " +
+                                                "GROUP BY tags.value " +
+                                                "ORDER BY COUNT(value) DESC, value " +
+                                                "LIMIT 10", timestamp);
+
+        return sqlContext.sql(sqlQuery);
+    }
+
+    private DataFrame getDataFrameByLanguage() {
+        String sqlQuery = "SELECT " +
+                                "tags.language as value, COUNT(tags.language) AS count " +
+                                "FROM tags " +
+                                "GROUP BY tags.language " +
+                                "ORDER BY COUNT(tags.language) DESC " +
+                                "LIMIT 10";
 
         return sqlContext.sql(sqlQuery);
     }

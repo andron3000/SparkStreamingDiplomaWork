@@ -9,6 +9,7 @@ import twitter4j.Status;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class TweetDataConverter {
@@ -17,7 +18,7 @@ public class TweetDataConverter {
         return TweetData.builder()
                 .createDate(new Timestamp(status.getCreatedAt().getTime()))
                 .country(status.getPlace() != null ? status.getPlace().getCountry() : null)
-                .language(status.getLang())
+                .language( new Locale(status.getLang()).getDisplayName())
                 .hashTags(getTweetHashTags(status.getHashtagEntities()))
                 .build();
     }
