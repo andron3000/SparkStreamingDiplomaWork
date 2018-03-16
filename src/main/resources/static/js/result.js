@@ -29,15 +29,10 @@ function drawTable(inputData) {
     table.draw(data, {showRowNumber: true, width: '100%', height: '100%', allowHtml: true});
 }
 
-function drawAllCharts(tweetPeriodDataMap, tweetDataMapPerAllTime, languageDataMap) {
+function drawAllCharts(tweetPeriodDataMap, languageDataMap) {
     var inputDataPerPeriod = [];
     for(var item in tweetPeriodDataMap) {
         inputDataPerPeriod.push([item, tweetPeriodDataMap[item]]);
-    }
-
-    var inputDataPerAllTime = [];
-    for(var item in tweetDataMapPerAllTime) {
-        inputDataPerAllTime.push([item, tweetDataMapPerAllTime[item]]);
     }
 
     var inputDataByLanguage = [];
@@ -47,7 +42,7 @@ function drawAllCharts(tweetPeriodDataMap, tweetDataMapPerAllTime, languageDataM
 
     drawPieChart(inputDataPerPeriod, 'Period', 'piechart_3d');
     drawPieChart(inputDataByLanguage, 'Language', 'piechart2_3d');
-    drawTable(inputDataPerAllTime);
+    drawTable(inputDataPerPeriod);
     drawGeoChart();
 }
 

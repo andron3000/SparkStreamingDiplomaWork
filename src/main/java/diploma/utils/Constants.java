@@ -10,4 +10,5 @@ public class Constants {
     public static final String HASH_TAG_TABLE = "hash_tag";
 
     public static final String ENGLISH_LANGUAGE = "en";
+    public static final String DATABASE_URL = "url";
 }

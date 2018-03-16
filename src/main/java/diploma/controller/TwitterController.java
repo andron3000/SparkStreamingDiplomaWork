@@ -19,7 +19,6 @@ public class TwitterController {
     public String getHomePage(Model model) {
         model.addAttribute(DISPLAY_START_PROCESSING,true);
         return "home";
-//        return "result"; // todo do not commit
     }
 
     @PostMapping("/start")

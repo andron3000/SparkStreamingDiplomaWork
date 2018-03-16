@@ -36,11 +36,10 @@
 
 <script th:inline="javascript">
     var tweetPeriodDataMap = [[${tweetPeriodDataMap}]];
-    var tweetDataMapPerAllTime = [[${tweetAllDataMap}]];
     var languageDataMap = [[${languageDataMap}]];
 
     google.charts.load("current", {packages:["corechart", "table", "map"],  "mapsApiKey": "AIzaSyD2vYB9MuCqsYNr_jM_uolzG0_dFg2THJY"});
-    google.charts.setOnLoadCallback(function(){ drawAllCharts(tweetPeriodDataMap, tweetDataMapPerAllTime, languageDataMap) })
+    google.charts.setOnLoadCallback(function(){ drawAllCharts(tweetPeriodDataMap, languageDataMap) })
 </script>
 
 </body>
