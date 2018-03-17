@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Welcome to Apache Spark</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/realTimeData.css}"></link>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" th:src="@{/js/realTimeData.js}"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div>
+    <div id="real_time_div"></div>
+    <form action="#" th:action="@{/stop}" method="post">
+        <input type="submit" value="stop stream" class="btn-primary btn-lg form-stop-position"/>
+    </form>
+</div>
+
+<script th:inline="javascript">
+    google.charts.load('current', {'packages': ['table', 'map', 'corechart']});
+    google.charts.setOnLoadCallback(function(){ realTimeData() })
+</script>
+
+
+</body>
+</html>

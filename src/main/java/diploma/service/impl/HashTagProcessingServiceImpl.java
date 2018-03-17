@@ -7,13 +7,9 @@ import diploma.dto.HashTagDto;
 import diploma.model.HashTag;
 import diploma.model.TweetData;
 import diploma.service.HashTagProcessingService;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoder;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -26,13 +22,13 @@ import twitter4j.Status;
 
 import java.sql.Timestamp;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static diploma.utils.Constants.DATABASE_URL;
-import static diploma.utils.Constants.HASH_TAG_TABLE;
-import static diploma.utils.Constants.TWEET_DATA_TABLE;
+import static diploma.utils.Constants.*;
 
 @Service
 public class HashTagProcessingServiceImpl implements HashTagProcessingService {
@@ -142,6 +138,26 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
                                                 "LIMIT 10", timestamp);
 
         return sparkSession.sql(sqlQuery);
+    }
+
+    @Override
+    public List<HashTag> getRealTimeHashTags() {
+        Encoder<HashTag> hashTagEncoder = Encoders.bean(HashTag.class);
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        timestamp = Timestamp.from(timestamp.toInstant().minus(Duration.ofSeconds(5)));
+
+        Dataset<Row> hashTagDataFrame = sparkSession.read()
+                .jdbc(configProperties.getProperty(DATABASE_URL), HASH_TAG_TABLE, configProperties)
+                .filter(functions.column("date").cast("TIMESTAMP").$greater(timestamp))
+                .limit(50)
+                .orderBy(functions.column("value"))
+                .toDF();
+
+        List<HashTag> tweetDataListPerPeriod = null;
+        if(Objects.nonNull(hashTagDataFrame)) {
+            tweetDataListPerPeriod = hashTagDataFrame.as(hashTagEncoder).collectAsList();
+        }
+        return !CollectionUtils.isEmpty(tweetDataListPerPeriod) ? tweetDataListPerPeriod : Collections.emptyList();
     }
 
     private Timestamp getTimestamp(int i) {

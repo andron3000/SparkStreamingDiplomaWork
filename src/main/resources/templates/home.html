@@ -13,17 +13,10 @@
 <div id="loader"></div>
 
 <div>
-    <span th:if="${displayStartProcessing}">
-        <form action="#" th:action="@{/start}" method="post">
-            <input type="submit" value="start stream" class="btn-primary btn-lg form-input-position"
-                   onclick="showSpinner()"/>
-        </form>
-    </span>
-    <span th:unless="${displayStartProcessing}">
-        <form action="#" th:action="@{/stop}" method="post">
-            <input type="submit" value="stop stream" class="btn-primary btn-lg form-input-position"/>
-        </form>
-    </span>
+    <form action="#" th:action="@{/start}" method="post">
+        <input type="submit" value="start stream" class="btn-primary btn-lg form-input-position"
+               onclick="showSpinner()"/>
+    </form>
 
     <p style="text-align:center;">
         <img th:src="@{/images/home.jpg}" alt="Logo"/>

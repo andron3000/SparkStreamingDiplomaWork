@@ -1,6 +1,9 @@
 package diploma.service;
 
+import diploma.model.HashTag;
 import org.springframework.ui.Model;
+
+import java.util.List;
 
 public interface HashTagProcessingService {
 
@@ -9,4 +12,6 @@ public interface HashTagProcessingService {
     void stopProcessingHashTags();
 
     void displayAnalyticResultByDate(Model model, int i);
+
+    List<HashTag> getRealTimeHashTags();
 }
