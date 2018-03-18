@@ -39,6 +39,13 @@ public class TwitterController {
         return "result";
     }
 
+    @GetMapping("/result")
+    public String selectDateRange(Model model) {
+        model.addAttribute("optionId", "0");
+        hashTagProcessingService.displayAnalyticResultByDate(model,0);
+        return "result";
+    }
+
     @PostMapping("/selector")
     public String selectDateRange(@ModelAttribute("optionId") String optionId, Model model) {
         model.addAttribute("optionId", optionId);
