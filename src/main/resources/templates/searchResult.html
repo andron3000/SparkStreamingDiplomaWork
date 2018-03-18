@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Result</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/searchPage.css}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" th:src="@{/js/searchPage.js}"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+<div id="custom_table"></div>
+
+</body>
+
+<script th:inline="javascript">
+    //    var countries = [[${countries}]];
+    var hashTags = [[${hashTags}]];
+
+    google.charts.load("current", {packages:["corechart", "table", "map"],  "mapsApiKey": "AIzaSyD2vYB9MuCqsYNr_jM_uolzG0_dFg2THJY"});
+    google.charts.setOnLoadCallback(function(){ drawCustomCharts(hashTags) })
+</script>
+</html>

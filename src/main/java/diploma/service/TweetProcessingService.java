@@ -1,6 +1,7 @@
 package diploma.service;
 
 import diploma.model.TweetData;
+import org.springframework.ui.Model;
 import twitter4j.Status;
 
 public interface TweetProcessingService {
@@ -10,4 +11,6 @@ public interface TweetProcessingService {
     boolean isSpecifiedLaguage(TweetData tweetData);
 
     boolean isEnglishLanguage(TweetData tweetData);
+
+    void searchTweetsByParameter(String searchParam, Model model);
 }

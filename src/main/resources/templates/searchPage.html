@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Result</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/searchPage.css}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" th:src="@{/js/searchPage.js}"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+<div style="text-align:center; position: absolute">
+    <img th:src="@{/images/search.jpeg}" alt="Logo" height="100%" width="100%"/>
+</div>
+
+<div class="row" style="position: relative">
+    <div class="col-lg-offset-4 col-lg-3" style="top: 200px">
+        <img th:src="@{/images/twitter.png}" alt="Logo" style="width: 400px"/>
+    </div>
+
+    <form action="#" th:action="@{/search-result}" method="post">
+        <div class="col-lg-offset-3 col-lg-6" style="top: 220px;">
+            <div class="input-group">
+                <input type="text" class="form-control" th:name='searchParam' placeholder="Search"/>
+                <div class="input-group-btn">
+                    <button class="btn btn-default" type="submit">
+                        <i class="glyphicon glyphicon-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

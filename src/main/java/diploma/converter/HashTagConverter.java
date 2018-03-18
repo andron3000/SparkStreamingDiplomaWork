@@ -30,4 +30,13 @@ public class HashTagConverter {
                      .map(HashtagEntity::getText)
                      .collect(Collectors.toList());
     }
+
+    public static Iterator<HashTag> customConvert(Status status) {
+        List<HashTag> hashTagList = new ArrayList<>();
+
+        List<String> tweetHashTags = getTweetHashTags(status.getHashtagEntities());
+        tweetHashTags.forEach(message -> hashTagList.add(HashTag.builder().value(message).language(status.getText()).build()));
+
+        return hashTagList.iterator();
+    }
 }
