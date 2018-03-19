@@ -11,19 +11,25 @@
 </head>
 <body>
 
-<ul class="pager col-lg-9 col-md-9" style="left: 100px">
-    <li class="selector-position"><a href="http://localhost:8085/search"
-                      style="color: black;font-weight: 700;width: 100px;">Previous</a></li>
-</ul>
+<div style="text-align: center;padding-bottom: 10px;padding-top: 10px;">
+    <label>Search result</label>
+</div>
+
 <div id="custom_table"></div>
+
+<div style="text-align: center;">
+    <ul class="pager">
+        <li class="selector-position"><a href="http://localhost:8085/search"
+                                         style="color: black;font-weight: 700;width: 100px;">Previous</a></li>
+    </ul>
+</div>
 
 </body>
 
 <script th:inline="javascript">
-    //    var countries = [[${countries}]];
     var hashTags = [[${hashTags}]];
 
-    google.charts.load("current", {packages:["corechart", "table", "map"],  "mapsApiKey": "AIzaSyD2vYB9MuCqsYNr_jM_uolzG0_dFg2THJY"});
+    google.charts.load("current", {packages:["corechart", "table", "map"]});
     google.charts.setOnLoadCallback(function(){ drawCustomCharts(hashTags) })
 </script>
 </html>

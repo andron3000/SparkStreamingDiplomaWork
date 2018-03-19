@@ -13,4 +13,6 @@ public interface TweetProcessingService {
     boolean isEnglishLanguage(TweetData tweetData);
 
     void searchTweetsByParameter(String searchParam, Model model);
+
+    void calculateTopTweetsMap(Model model);
 }

@@ -7,9 +7,20 @@ import diploma.service.TweetProcessingService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import twitter4j.*;
+import twitter4j.Location;
+import twitter4j.Query;
+import twitter4j.QueryResult;
+import twitter4j.ResponseList;
+import twitter4j.Status;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static diploma.utils.Constants.ENGLISH_LANGUAGE;
 
@@ -34,16 +45,8 @@ public class TweetProcessingServiceImpl implements TweetProcessingService {
     @Override
     public void searchTweetsByParameter(String searchParam, Model model) {
         Twitter twitter = new TwitterFactory().getInstance();
-//        Set<String> countriesList = new HashSet<>();
         List<HashTag> customHashTags = new ArrayList<>();
-
         try {
-//            ResponseList<Location> availableTrends = twitter.getAvailableTrends();
-//            availableTrends.stream()
-//                    .filter(x-> StringUtils.isNotBlank(x.getCountryName()))
-//                    .map(Location::getCountryName)
-//                    .forEach(countriesList::add);
-
             Query query = new Query(searchParam);
             QueryResult result;
             do {
@@ -54,12 +57,26 @@ public class TweetProcessingServiceImpl implements TweetProcessingService {
                         .map(HashTagConverter::customConvert)
                         .forEach(x-> x.forEachRemaining(customHashTags::add));
             } while ((query = result.nextQuery()) != null && customHashTags.size() < 50);
-
-//            model.addAttribute("countries", countriesList);
             model.addAttribute("hashTags", customHashTags);
 
         } catch (TwitterException te) {
             System.out.println("Failed to search tweets: " + te.getMessage());
+        }
+    }
+
+    @Override
+    public void calculateTopTweetsMap(Model model) {
+        Twitter twitter = new TwitterFactory().getInstance();
+        Map<String, Long> locationMap;
+        try {
+            ResponseList<Location> availableTrends = twitter.getAvailableTrends();
+            locationMap = availableTrends.stream()
+                                         .filter(x -> StringUtils.isNotBlank(x.getCountryName()))
+                                         .collect(Collectors.groupingBy(Location::getCountryName, Collectors.counting()));
+
+            model.addAttribute("countries", locationMap);
+        } catch (TwitterException te) {
+            System.out.println("Failed to fetch tweets: " + te.getMessage());
         }
     }
 }

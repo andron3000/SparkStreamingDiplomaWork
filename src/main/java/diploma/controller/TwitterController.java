@@ -69,4 +69,10 @@ public class TwitterController {
         tweetProcessingService.searchTweetsByParameter(searchParam, model);
         return "searchResult";
     }
+
+    @GetMapping("/tweetMap")
+    public String displayTweetMap(Model model) {
+        tweetProcessingService.calculateTopTweetsMap(model);
+        return "tweetMap";
+    }
 }

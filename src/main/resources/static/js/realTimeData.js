@@ -19,10 +19,20 @@ function drawRealTimeChart() {
                 data.addColumn('string', 'Language');
 
                 data.addRows(inputData);
-                data.sort({column: 1, desc: true});
+
+                var options =  {
+                    showRowNumber: true,
+                    width: '100%',
+                    height: '100%',
+                    allowHtml: true,
+                    page: 'enable',
+                    cssClassNames: {
+                        tableCell: 'small-font'
+                    }
+                };
 
                 var table = new google.visualization.Table(document.getElementById('real_time_div'));
-                table.draw(data, {showRowNumber: true, width: '100%', height: '100%', allowHtml: true});
+                table.draw(data, options);
             }
         }
     });

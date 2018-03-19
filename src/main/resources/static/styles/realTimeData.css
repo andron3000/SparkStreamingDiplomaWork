@@ -2,3 +2,16 @@
     position: absolute;
     margin-left: 605px;
 }
+
+.small-font {
+    height: 40px;
+    width: 50px;
+}
+
+table, tr, th, td {
+    text-align: center !important;
+}
+
+th {
+    background-color: darkgrey !important;
+}

@@ -144,13 +144,13 @@ public class HashTagProcessingServiceImpl implements HashTagProcessingService {
     public List<HashTag> getRealTimeHashTags() {
         Encoder<HashTag> hashTagEncoder = Encoders.bean(HashTag.class);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        timestamp = Timestamp.from(timestamp.toInstant().minus(Duration.ofSeconds(5)));
+        timestamp = Timestamp.from(timestamp.toInstant().minus(Duration.ofSeconds(1)));
 
         Dataset<Row> hashTagDataFrame = sparkSession.read()
                 .jdbc(configProperties.getProperty(DATABASE_URL), HASH_TAG_TABLE, configProperties)
                 .filter(functions.column("date").cast("TIMESTAMP").$greater(timestamp))
+                .orderBy(functions.column("date").desc())
                 .limit(50)
-                .orderBy(functions.column("value"))
                 .toDF();
 
         List<HashTag> tweetDataListPerPeriod = null;

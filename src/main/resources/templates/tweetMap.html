@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Result</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/styles/tweetMap.css}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" th:src="@{/js/tweetMap.js}"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+<div id="regions_div" style="position: absolute; width: 100%; height: 100%"></div>
+
+<div class="row">
+    <ul class="pager col-ld-3" style="position: relative;">
+        <li class="selector-position">
+            <a href="http://localhost:8085/result" style="color: black;font-weight: 700;width: 100px;">Previous</a>
+        </li>
+    </ul>
+
+    <label style="display: block;text-align: center;position: relative;">Top Trending Countries by Tweets</label>
+</div>
+</body>
+
+<script th:inline="javascript">
+    var countries = [[${countries}]];
+    google.charts.load("current", {packages:["corechart", "table", "map", "geochart"],  "mapsApiKey": "AIzaSyD2vYB9MuCqsYNr_jM_uolzG0_dFg2THJY"});
+    google.charts.setOnLoadCallback(function(){ drawGeoMap(countries) })
+</script>
+</html>

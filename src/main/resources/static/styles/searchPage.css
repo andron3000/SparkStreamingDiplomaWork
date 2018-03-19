@@ -1,0 +1,11 @@
+.small-font {
+    height: 40px;
+}
+
+table, tr, th, td {
+    text-align: center !important;
+}
+
+th {
+    background-color: darkgrey !important;
+}
