@@ -5,15 +5,19 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" th:href="@{/styles/result.css}"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
+            integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.12.0/jquery.validate.min.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" th:src="@{/js/result.js}"></script>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
-
 <div class="row">
     <div class="col-md-offset-4 col-lg-2 col-md-2">
-         <h3 id="title_text">Top Hashtags</h3>
+        <h3 id="title_text">Top Hashtags</h3>
     </div>
     <div class="col-md-offset-4 col-lg-1 col-md-1 selector-position">
         <form action="#" th:action="@{/selector}" method="post">
@@ -21,32 +25,115 @@
                 <option th:value="0" th:text="hour" th:selected="(${optionId} == '0')"></option>
                 <option th:value="1" th:text="day" th:selected="(${optionId} == '1')"></option>
                 <option th:value="2" th:text="all_time" th:selected="(${optionId} == '2')"></option>
-           </select>
+            </select>
         </form>
     </div>
     <ul class="pager col-md-offset-1 col-lg-5 col-md-5" style="left: 50px; margin-top: 16px;">
         <li class="selector-position "><a href="http://localhost:8085/search"
                                           style="color: black;font-weight: 700;width: 200px;">Search</a></li>
         <li class="selector-position" style="padding-left: 60px;"><a href="http://localhost:8085/tweetMap"
-                                          style="color: black;font-weight: 700;width: 200px;">Top tranding countries</a></li>
+                                                                     style="color: black;font-weight: 700;width: 200px;">Top tranding countries</a></li>
     </ul>
 </div>
 
-<div class="row">
-    <div id="piechart_3d" class="col-lg-6 col-md-6"></div>
-    <div id="piechart2_3d" class="col-lg-6 col-md-6"></div>
+<div id="pdf">
+    <div class="row">
+        <div id="piechart_3d" class="col-lg-6 col-md-6"></div>
+        <div id="piechart2_3d" class="col-lg-6 col-md-6"></div>
+    </div>
+
+    <div id="hashTag_table" class=""></div>
 </div>
 
-<div id="hashTag_table"></div>
-<div id="map_div"></div>
+<div style="text-align: center;margin-top: 20px;">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">send report</button>   <!--onclick="sendReport()"-->
+    <button onclick="downloadReport()" class="btn btn-primary">download report</button>
+</div>
 
 <script th:inline="javascript">
     var tweetPeriodDataMap = [[${tweetPeriodDataMap}]];
     var languageDataMap = [[${languageDataMap}]];
 
-    google.charts.load("current", {packages:["corechart", "table"]});
-    google.charts.setOnLoadCallback(function(){ drawAllCharts(tweetPeriodDataMap, languageDataMap) })
+    google.charts.load("current", {packages: ["corechart", "table"]});
+    google.charts.setOnLoadCallback(function () {
+        drawAllCharts(tweetPeriodDataMap, languageDataMap)
+    });
+
+    function downloadReport() {
+        var node = document.getElementById('pdf');
+        domtoimage.toPng(node)
+            .then(function (dataUrl) {
+                downloadCustomReport(dataUrl);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    function sendReport(email) {
+        var node = document.getElementById('pdf');
+        domtoimage.toPng(node)
+            .then(function (dataUrl) {
+                sendEmail(dataUrl, email);
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    }
+
+    function downloadCustomReport(dataUrl) {
+        var link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = 'result.jpg';
+        document.body.appendChild(link);
+        link.click();
+    }
+
+    function sendEmail(dataUrl, email) {
+        var inputData = {};
+        inputData.receiver = email;
+        inputData.attachFileUrl = dataUrl;
+
+        $.ajax({
+            url: 'http://localhost:8085/sendEmail',
+            contentType: "application/json",
+            type: 'post',
+            data: JSON.stringify(inputData)
+        });
+    }
+
+    function validateForm() {
+        if($("#emailForm").valid()) {
+            var email = $("#inputEmail").val();
+            sendReport(email);
+            $('#myModal').modal('toggle');
+        }
+    }
 </script>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog  modal-sm" role="document">
+        <div class="modal-content" style="top: 200px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Enter email</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="emailForm">
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="inputEmail" placeholder="Email" required="required" />
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="validateForm()">Send report</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
